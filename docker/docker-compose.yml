@@ -1,0 +1,30 @@
+services:
+  odp_dev:
+    build: .
+    volumes:
+      - /home:/home # mount home folder
+      - /cache:/cache
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw # needed for X11 forwarding
+      - ./entry.sh:/entry.sh
+      - ./user_entry.sh:/user_entry.sh
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+      - ./requirements.txt:/requirements.txt
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - USER=$USER
+      - UID=$UID
+      - HOST_USER=$USER
+      - HOST_UID=$UID
+      - NVIDIA_VISIBLE_DEVICES=all
+    ports:
+      - "12123:22"
+      - "5000:5000"
+      - "2375:2375" # Expose port 2375 for Docker socket access
+    entrypoint: [ "/entry.sh", "true" ]
+    ipc: host
+    container_name: bme_dev_container
+    hostname: ${USER}-dev
+    working_dir: /home
+    runtime: nvidia
